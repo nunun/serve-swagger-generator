@@ -8,6 +8,7 @@ export RSYNCD_TIMEOUT="${RSYNCD_TIMEOUT:-"1800"}"
 export RSYNCD_MAX_CONNECTIONS="${RSYNCD_MAX_CONNECTIONS:-"1"}"
 export RSYNCD_USERNAME="${RSYNCD_USERNAME:-"username"}"
 export RSYNCD_PASSWORD="${RSYNCD_PASSWORD:-"password"}"
+export HTTPD_POLLEE_PORT="${HTTPD_POLLEE_PORT:-"80"}"
 export CODEGEN_URL="${CODEGEN_URL:-""}"
 export CODEGEN_LANG="${CODEGEN_LANG:-"php"}"
 export CODEGEN_OPTIONS="${CODEGEN_OPTIONS:-"password"}"
@@ -75,6 +76,29 @@ check_rsyncd() {
         fi
 }
 
+# httpd_pollee
+httpd_pollee() {
+        echo "(-> httpd_pollee)"
+        echo "httpd pollee is listening on port ${HTTPD_POLLEE_PORT}."
+        R="require 'webrick';s=WEBrick::HTTPServer.new({Port:${HTTPD_POLLEE_PORT}})"
+        R="${R};s.mount_proc('/'){|q,r|r.body=File.mtime('${RSYNCD_MODULE_DIR}').to_s}"
+        R="${R};s.start"
+        ruby -e "${R}" > /dev/null 2>&1
+        echo "(<- httpd_pollee)"
+}
+start_httpd_pollee() {
+        stop_httpd_pollee
+        httpd_pollee &
+}
+stop_httpd_pollee() {
+        pkill -f 'ruby -e'
+}
+check_httpd_pollee() {
+        if [ "`pgrep -f 'ruby -e'`" = "" ]; then
+                start_httpd_pollee
+        fi
+}
+
 # spec.yaml
 check_spec() {
         FOUND="`find ${SPEC_FILE} -mmin -${CODEGEN_CHECK_INTERVAL}`"
@@ -112,6 +136,7 @@ touch /.modified
 # daemon loop
 while : ; do
         check_rsyncd
+        check_httpd_pollee
         check_spec
         sleep "${DAEMON_CHECK_INTERVAL}"
 done

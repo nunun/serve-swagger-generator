@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk --update add wget curl bash make g++ rsync tzdata
+RUN apk --update add wget curl bash make g++ rsync ruby tzdata
 
 # install groovy
 ENV GROOVY_HOME=/opt/groovy \
