@@ -1,0 +1,20 @@
+version: '3'
+services:
+  serve-swagger-editor:
+    image: nunun/serve-swagger-editor
+    volumes:
+      - ./test.yml:/spec.yaml
+    ports:
+      - "28080:8080"
+
+  serve-swagger-generator:
+    build: ./
+    image: nunun/serve-swagger-generator
+    environment:
+      - RSYNCD_USERNAME=admin
+      - RSYNCD_PASSWORD=hogehoge
+    volumes:
+      - ./test.yml:/spec.yaml
+    ports:
+      - "20873:873"
+
