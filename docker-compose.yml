@@ -13,6 +13,8 @@ services:
     environment:
       - RSYNCD_USERNAME=admin
       - RSYNCD_PASSWORD=hogehoge
+      - CODEGEN_LANG=php
+      - CODEGEN_OPTIONS=
     volumes:
       - ./test.yml:/spec.yaml
     ports:
