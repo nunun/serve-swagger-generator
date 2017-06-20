@@ -61,9 +61,8 @@ RUN  echo "Installing Groovy Dependencies" \
  && mkdir -p /home/groovy/.groovy/grapes \
  && chown -R groovy:groovy /home/groovy
 
+WORKDIR /
 ADD src      /
 ADD start.sh /
-
-WORKDIR /
-
+RUN touch /spec.yaml
 CMD sh /start.sh

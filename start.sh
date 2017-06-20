@@ -8,10 +8,18 @@ export RSYNCD_TIMEOUT="${RSYNCD_TIMEOUT:-"1800"}"
 export RSYNCD_MAX_CONNECTIONS="${RSYNCD_MAX_CONNECTIONS:-"1"}"
 export RSYNCD_USERNAME="${RSYNCD_USERNAME:-"username"}"
 export RSYNCD_PASSWORD="${RSYNCD_PASSWORD:-"password"}"
-export CODEGEN_LANG="php"
-export CODEGEN_OPTIONS=""
+export CODEGEN_URL="${CODEGEN_URL:-""}"
+export CODEGEN_LANG="${CODEGEN_LANG:-"php"}"
+export CODEGEN_OPTIONS="${CODEGEN_OPTIONS:-"password"}"
+export CODEGEN_CHECK_INTERVAL="${CODEGEN_CHECK_INTERVAL:-"1"}"
 export DAEMON_CHECK_INTERVAL="${DAEMON_CHECK_INTERVAL:-"20"}"
 export TZ="${TZ:-"UTC"}"
+
+# spec.yaml
+SPEC_FILE="/spec.yaml"
+if [ ! "${CODEGEN_URL}" = "" ]; then
+        SPEC_FILE="/spec.download.yaml"
+fi
 
 # timezone
 cp /usr/share/zoneinfo/$TZ /etc/localtime
@@ -46,7 +54,7 @@ mkdir -p /var/log/
 touch /var/log/rsync.log
 start_rsyncd() {
         stop_rsyncd
-        tail -f /var/log/rsync.log &
+        tail -n0 -f /var/log/rsync.log &
         rsync --daemon
         sleep 5
 }
@@ -69,21 +77,28 @@ check_rsyncd() {
 
 # spec.yaml
 check_spec() {
-        FOUND="`find /spec.yaml -mmin -1`"
+        FOUND="`find ${SPEC_FILE} -mmin -${CODEGEN_CHECK_INTERVAL}`"
         if [ "${FOUND}" = "" ]; then
+                if [ ! "${CODEGEN_URL}" = "" ]; then
+                        echo "downloading spec ... ${CODEGEN_URL}"
+                        curl -o ${SPEC_FILE} "${CODEGEN_URL}"
+                        touch /.modified
+                fi
                 if [ -f "/.modified" ]; then
                         echo "spec update detected."
+                        echo "stopping rsyncd ..."
                         stop_rsyncd
                         rm -vrf /.modified
-                        cp -v /spec.yaml /gen.yaml
+                        cp -v ${SPEC_FILE} /spec.gen.yaml
                         rm -vrf /data/*
                         echo "generate spec code ..."
                         groovy /SwaggerCodegenCli.groovy generate \
-                                -i /gen.yaml \
+                                -i /spec.gen.yaml \
                                 -l ${CODEGEN_LANG} \
                                 -o /data \
                                 ${CODEGEN_OPTIONS}
                         echo "generate done."
+                        echo "restarting rsyncd ..."
                         start_rsyncd
                 fi
         else
