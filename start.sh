@@ -11,7 +11,7 @@ export RSYNCD_PASSWORD="${RSYNCD_PASSWORD:-"password"}"
 export HTTPD_POLLEE_PORT="${HTTPD_POLLEE_PORT:-"80"}"
 export CODEGEN_URL="${CODEGEN_URL:-""}"
 export CODEGEN_LANG="${CODEGEN_LANG:-"php"}"
-export CODEGEN_OPTIONS="${CODEGEN_OPTIONS:-""}"
+export CODEGEN_CONFIG="${CODEGEN_CONFIG:-""}"
 export CODEGEN_CHECK_INTERVAL="${CODEGEN_CHECK_INTERVAL:-"1"}"
 export DAEMON_CHECK_INTERVAL="${DAEMON_CHECK_INTERVAL:-"20"}"
 export TZ="${TZ:-"UTC"}"
@@ -115,6 +115,12 @@ check_spec() {
                         rm -vrf /.modified
                         cp -v ${SPEC_FILE} /spec.gen.yaml
                         rm -vrf /data/*
+                        echo "check config ..."
+                        CODEGEN_OPTIONS=""
+                        if [ ! "${CODEGEN_CONFIG}" = "" ]; then
+                                echo "${CODEGEN_CONFIG}" > /.config
+                                CODEGEN_OPTIONS="-c /.config"
+                        fi
                         echo "generate spec code ..."
                         groovy /SwaggerCodegenCli.groovy generate \
                                 -i /spec.gen.yaml \

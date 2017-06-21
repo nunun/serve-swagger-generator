@@ -13,8 +13,8 @@ services:
     environment:
       - RSYNCD_USERNAME=admin
       - RSYNCD_PASSWORD=hogehoge
-      - CODEGEN_LANG=php
-      - CODEGEN_OPTIONS=
+      - CODEGEN_LANG=CsharpDotNet2
+      - CODEGEN_CONFIG={"packageName":"NNO.Editor"}
       #- CODEGEN_URL=http://petstore.swagger.io/v2/swagger.yaml
       #- CODEGEN_CHECK_INTERVAL=1
     volumes:
