@@ -19,6 +19,7 @@ services:
       #- CODEGEN_CHECK_INTERVAL=1
     volumes:
       - ./test.yml:/spec.yaml
+      - ./test.yml:/bundles/test.yaml
     ports:
       - "20873:873"
 

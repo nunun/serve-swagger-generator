@@ -127,6 +127,10 @@ check_spec() {
                                 -l ${CODEGEN_LANG} \
                                 -o /data \
                                 ${CODEGEN_OPTIONS}
+                        if [ -d "/bundles" ]; then
+                                echo "add bundle files ..."
+                                cp -rv /bundles/* /data/
+                        fi
                         echo "generate done."
                         echo "restarting rsyncd ..."
                         start_rsyncd
