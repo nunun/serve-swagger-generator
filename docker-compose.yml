@@ -8,18 +8,19 @@ services:
       - "28080:8080"
 
   serve-swagger-generator:
-    build: ./
     image: nunun/serve-swagger-generator
+    build: ./
     environment:
       - RSYNCD_USERNAME=admin
       - RSYNCD_PASSWORD=hogehoge
       - CODEGEN_LANG=CsharpDotNet2
-      - CODEGEN_CONFIG={"packageName":"NNO.Editor"}
+      - CODEGEN_TEMPLATE=/t
+      - CODEGEN_CONFIG={"packageName":"Test.Ns"}
       #- CODEGEN_URL=http://petstore.swagger.io/v2/swagger.yaml
       #- CODEGEN_CHECK_INTERVAL=1
     volumes:
       - ./test.yml:/spec.yaml
-      - ./test.yml:/bundles/test.yaml
+      - ./test.t:/t
     ports:
       - "20873:873"
 

@@ -14,7 +14,7 @@ export CODEGEN_LANG="${CODEGEN_LANG:-"php"}"
 export CODEGEN_TEMPLATE="${CODEGEN_TEMPLATE:-""}"
 export CODEGEN_CONFIG="${CODEGEN_CONFIG:-""}"
 export CODEGEN_CHECK_INTERVAL="${CODEGEN_CHECK_INTERVAL:-"1"}"
-export DAEMON_CHECK_INTERVAL="${DAEMON_CHECK_INTERVAL:-"20"}"
+export DAEMON_CHECK_INTERVAL="${DAEMON_CHECK_INTERVAL:-"10"}"
 export TZ="${TZ:-"UTC"}"
 
 # spec.yaml
@@ -58,14 +58,14 @@ start_rsyncd() {
         stop_rsyncd
         tail -n0 -f /var/log/rsync.log &
         rsync --daemon
-        sleep 5
+        sleep 3
 }
 stop_rsyncd() {
         pkill -f 'rsync.log'
         pkill -f 'rsync --daemon'
         rm -rf /var/run/rsyncd.pid
         rm -rf /var/run/rsyncd.lock
-        sleep 5
+        sleep 3
 }
 check_rsyncd() {
         if [ -f "/.rsyncd_lock" ]; then
@@ -119,11 +119,11 @@ check_spec() {
                         echo "check config ..."
                         CODEGEN_OPTIONS=""
                         if [ ! "${CODEGEN_TEMPLATE}" = "" ]; then
-                                CODEGEN_OPTIONS="#{CODEGEN_OPTIONS} -t \"#{CODEGEN_TEMPLATE}\""
+                                CODEGEN_OPTIONS="${CODEGEN_OPTIONS} -t ${CODEGEN_TEMPLATE}"
                         fi
                         if [ ! "${CODEGEN_CONFIG}" = "" ]; then
                                 echo "${CODEGEN_CONFIG}" > /.config
-                                CODEGEN_OPTIONS="#{CODEGEN_OPTIONS} -c /.config"
+                                CODEGEN_OPTIONS="${CODEGEN_OPTIONS} -c /.config"
                         fi
                         echo "generate spec code ..."
                         groovy /SwaggerCodegenCli.groovy generate \
