@@ -1,5 +1,7 @@
 docker-compose down
-if [ "${1}" = "stop" ]; then
-        exit
-fi
+case "${1}" in
+down) exit;;
+pull) docker-compose pull; exit;;
+esac
 docker-compose up --build
+
