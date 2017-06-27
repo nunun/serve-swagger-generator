@@ -65,4 +65,8 @@ WORKDIR /
 ADD src      /
 ADD start.sh /
 RUN touch /spec.yaml
+
+# warmup
+RUN groovy /SwaggerCodegenCli.groovy
+
 CMD sh /start.sh
