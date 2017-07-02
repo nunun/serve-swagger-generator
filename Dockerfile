@@ -66,7 +66,7 @@ ADD src      /
 ADD start.sh /
 RUN touch /spec.yaml
 
-# warmup
-RUN groovy /SwaggerCodegenCli.groovy
+# groovy grape caching
+RUN grape install io.swagger swagger-codegen-cli 2.2.2
 
 CMD sh /start.sh
